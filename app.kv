@@ -1,43 +1,47 @@
-#:kivy 2.2.0
+#:kivy 2.0.0
 
-<TravelTrackerApp>:
+BoxLayout:
+    orientation: 'vertical'
+    padding: 10
+    spacing: 5
+
+    Label:
+        id: status_label
+        text: "Places to visit: 0"
+        size_hint_y: 0.1
+
+    GridLayout:
+        id: place_layout
+        cols: 1
+        size_hint_y: 0.5
+
     BoxLayout:
-        orientation: 'vertical'
-        padding: 10
-        spacing: 10
+        size_hint_y: 0.1
+        spacing: 5
+        TextInput:
+            id: name_input
+            hint_text: "Name"
+        TextInput:
+            id: country_input
+            hint_text: "Country"
+        TextInput:
+            id: priority_input
+            hint_text: "Priority"
+        Button:
+            text: "Add"
+            on_press: app.add_new_place()
+        Button:
+            text: "Clear"
+            on_press: app.clear_inputs()
 
-        Label:
-            text: root.status_label.text
-            size_hint: (1, 0.1)
-            font_size: 18
+    Spinner:
+        id: sort_spinner
+        text: "name"
+        values: ["name", "country", "priority", "visited"]
+        on_text: app.sort_places()
+        size_hint_y: 0.1
 
-        BoxLayout:
-            id: places_layout
-            orientation: 'vertical'
-            size_hint: (1, 0.7)
-
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: (1, 0.2)
-            spacing: 5
-
-            TextInput:
-                id: name_input
-                hint_text: "Name"
-                size_hint: (0.3, 1)
-
-            TextInput:
-                id: country_input
-                hint_text: "Country"
-                size_hint: (0.3, 1)
-
-            Spinner:
-                id: priority_spinner
-                text: "1"
-                values: [str(i) for i in range(1, 6)]
-                size_hint: (0.2, 1)
-
-            Button:
-                text: "Add Place"
-                size_hint: (0.2, 1)
-                on_press: root.add_place(self)
+    Label:
+        id: message_label
+        text: ""
+        size_hint_y: 0.1

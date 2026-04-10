@@ -1,85 +1,91 @@
 """
 CP1404 Assignment 2
-Kivy GUI Main Program
+GUI Program
+Student: Qiuhao Wu
+ID: 15136727
 """
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.button import Button
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.spinner import Spinner
-from place import Place
 from placecollection import PlaceCollection
 
 Builder.load_file('app.kv')
 
-class TravelTrackerApp(App):
-    def build(self):
+
+class TravelApp(App):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.collection = PlaceCollection()
         self.collection.load_places("places.json")
+
+    def build(self):
         self.title = "Travel Tracker 2.0"
+        return self.root
 
-        # Main layout
-        self.main_layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+    def update_places(self):
+        self.root.ids.place_layout.clear_widgets()
+        for place in self.collection.places:
+            btn = Button(text=f"{place.name} - {place.country}")
+            if place.visited:
+                btn.background_color = (0.5, 1, 0.5, 1)
+            else:
+                btn.background_color = (1, 0.7, 0.7, 1)
+            btn.bind(on_press=lambda x, p=place: self.toggle_place(p))
+            self.root.ids.place_layout.add_widget(btn)
+        self.root.ids.status_label.text = f"Places to visit: {self.collection.get_unvisited_count()}"
 
-        # Status label
-        self.status_label = Label(text=f"{self.collection.get_unvisited_count()} places to visit!", size_hint=(1, 0.1))
-        self.main_layout.add_widget(self.status_label)
-
-        # Places list layout
-        self.places_layout = BoxLayout(orientation='vertical', size_hint=(1, 0.7))
-        self.update_places_list()
-        self.main_layout.add_widget(self.places_layout)
-
-        # Input layout for adding new place
-        input_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.2), spacing=5)
-        self.name_input = TextInput(hint_text="Name", size_hint=(0.3, 1))
-        self.country_input = TextInput(hint_text="Country", size_hint=(0.3, 1))
-        self.priority_spinner = Spinner(text="1", values=[str(i) for i in range(1, 6)], size_hint=(0.2, 1))
-        add_button = Button(text="Add Place", size_hint=(0.2, 1), on_press=self.add_place)
-        input_layout.add_widget(self.name_input)
-        input_layout.add_widget(self.country_input)
-        input_layout.add_widget(self.priority_spinner)
-        input_layout.add_widget(add_button)
-        self.main_layout.add_widget(input_layout)
-
-        return self.main_layout
-
-    def update_places_list(self):
-        self.places_layout.clear_widgets()
-        self.collection.sort("visited")
-        for i, place in enumerate(self.collection.places, 1):
-            visited_mark = "*" if not place.visited else ""
-            btn = Button(
-                text=f"{i}. {place.name} - {place.country} (Priority {place.priority}) {visited_mark}",
-                size_hint=(1, None),
-                height=40
-            )
-            btn.bind(on_press=lambda instance, p=place: self.mark_visited(p))
-            self.places_layout.add_widget(btn)
-        self.status_label.text = f"{self.collection.get_unvisited_count()} places to visit!"
-
-    def mark_visited(self, place):
-        if not place.visited:
-            place.mark_visited()
-            self.collection.save_places("places.json")
-            self.update_places_list()
-
-    def add_place(self, instance):
-        name = self.name_input.text.strip()
-        country = self.country_input.text.strip()
-        priority = int(self.priority_spinner.text)
-        if name and country:
-            new_place = Place(name, country, priority, False)
-            self.collection.add_place(new_place)
-            self.collection.save_places("places.json")
-            self.update_places_list()
-            self.name_input.text = ""
-            self.country_input.text = ""
-
-    def on_stop(self):
+    def toggle_place(self, place):
+        place.visited = not place.visited
+        if place.visited:
+            if place.is_important():
+                self.root.ids.message_label.text = f"You visited {place.name}. Great travelling!"
+            else:
+                self.root.ids.message_label.text = f"You visited {place.name}."
+        else:
+            if place.is_important():
+                self.root.ids.message_label.text = f"You need to visit {place.name}. Get going!"
+            else:
+                self.root.ids.message_label.text = f"You need to visit {place.name}."
+        self.update_places()
         self.collection.save_places("places.json")
 
-if __name__ == "__main__":
-    TravelTrackerApp().run()
+    def add_new_place(self):
+        name = self.root.ids.name_input.text.strip()
+        country = self.root.ids.country_input.text.strip()
+        priority_str = self.root.ids.priority_input.text.strip()
+
+        if not name or not country or not priority_str:
+            self.root.ids.message_label.text = "All fields must be completed"
+            return
+
+        try:
+            priority = int(priority_str)
+            if priority < 1:
+                self.root.ids.message_label.text = "Priority must be > 0"
+                return
+        except ValueError:
+            self.root.ids.message_label.text = "Please enter a valid number"
+            return
+
+        self.collection.add_place(Place(name, country, priority, False))
+        self.collection.save_places("places.json")
+        self.update_places()
+        self.clear_inputs()
+        self.root.ids.message_label.text = f"Added {name}"
+
+    def clear_inputs(self):
+        self.root.ids.name_input.text = ""
+        self.root.ids.country_input.text = ""
+        self.root.ids.priority_input.text = ""
+        self.root.ids.message_label.text = ""
+
+    def sort_places(self):
+        key = self.root.ids.sort_spinner.text
+        self.collection.sort(key)
+        self.update_places()
+
+
+if __name__ == '__main__':
+    app = TravelApp()
+    app.run()
+    app.collection.save_places("places.json")

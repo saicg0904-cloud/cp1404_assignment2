@@ -1,1 +1,7 @@
-[]
+[
+    {"name": "Paris", "country": "France", "priority": 1, "visited": true},
+    {"name": "Tokyo", "country": "Japan", "priority": 2, "visited": false},
+    {"name": "Sydney", "country": "Australia", "priority": 3, "visited": false},
+    {"name": "Rome", "country": "Italy", "priority": 1, "visited": false},
+    {"name": "New York", "country": "USA", "priority": 2, "visited": true}
+]

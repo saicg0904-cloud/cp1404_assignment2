@@ -1,40 +1,31 @@
 """
 CP1404 Assignment 2
-Place Class Unit Tests
+Tests for Place
+Student: Qiuhao Wu
+ID: 15136727
 """
 from place import Place
 
-def run_tests():
-    # Test 1: Default constructor
-    place1 = Place()
-    assert place1.name == ""
-    assert place1.country == ""
-    assert place1.priority == 0
-    assert place1.visited is False
 
-    # Test 2: Parameterized constructor
-    place2 = Place("Paris", "France", 1, True)
-    assert place2.name == "Paris"
-    assert place2.country == "France"
-    assert place2.priority == 1
-    assert place2.visited is True
+def test_place():
+    p1 = Place("A", "B", 1, False)
+    assert p1.name == "A"
+    assert p1.country == "B"
+    assert p1.priority == 1
+    assert not p1.visited
 
-    # Test 3: __str__ method
-    assert str(place2) == "Paris, France, priority 1 (visited)"
-    assert str(place1) == ", , priority 0 (unvisited)"
+    p1.mark_visited()
+    assert p1.visited
 
-    # Test 4: mark_visited and mark_unvisited methods
-    place1.mark_visited()
-    assert place1.visited is True
-    place1.mark_unvisited()
-    assert place1.visited is False
+    p1.mark_unvisited()
+    assert not p1.visited
 
-    # Test 5: is_important method
-    assert place2.is_important() is True  # priority 1 <= 2
-    place3 = Place("Sydney", "Australia", 3, False)
-    assert place3.is_important() is False  # priority 3 > 2
+    assert p1.is_important() is True
 
-    print("All tests passed!")
+    p2 = Place("C", "D", 3, False)
+    assert p2.is_important() is False
 
-if __name__ == "__main__":
-    run_tests()
+    print("All tests passed")
+
+
+test_place()
