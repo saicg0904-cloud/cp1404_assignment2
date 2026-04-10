@@ -4,6 +4,7 @@ Console Program
 Student: Qiuhao Wu
 ID: 15136727
 """
+from place import Place
 from placecollection import PlaceCollection
 
 MENU = "L - List places\nA - Add new place\nM - Mark place as visited\nQ - Quit"
@@ -63,7 +64,7 @@ def mark_place(collection):
         place = collection.places[choice]
         place.mark_visited()
         print(f"{place.name} marked as visited.")
-    except:
+    except (ValueError, IndexError):
         print("Invalid number")
 
 

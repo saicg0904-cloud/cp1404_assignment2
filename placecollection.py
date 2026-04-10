@@ -5,6 +5,7 @@ Student: Qiuhao Wu
 ID: 15136727
 """
 import json
+from operator import attrgetter
 from place import Place
 
 
@@ -33,4 +34,4 @@ class PlaceCollection:
         return sum(1 for p in self.places if not p.visited)
 
     def sort(self, key):
-        self.places.sort(key=lambda x: getattr(x, key))
+        self.places.sort(key=attrgetter(key, "priority"))

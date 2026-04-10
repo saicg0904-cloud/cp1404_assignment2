@@ -7,9 +7,8 @@ ID: 15136727
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.button import Button
+from place import Place
 from placecollection import PlaceCollection
-
-Builder.load_file('app.kv')
 
 
 class TravelApp(App):
@@ -20,6 +19,8 @@ class TravelApp(App):
 
     def build(self):
         self.title = "Travel Tracker 2.0"
+        self.root = Builder.load_file("app.kv")
+        self.update_places()
         return self.root
 
     def update_places(self):
@@ -27,9 +28,9 @@ class TravelApp(App):
         for place in self.collection.places:
             btn = Button(text=f"{place.name} - {place.country}")
             if place.visited:
-                btn.background_color = (0.5, 1, 0.5, 1)
+                btn.background_color = 0.5, 1, 0.5, 1
             else:
-                btn.background_color = (1, 0.7, 0.7, 1)
+                btn.background_color = 1, 0.7, 0.7, 1
             btn.bind(on_press=lambda x, p=place: self.toggle_place(p))
             self.root.ids.place_layout.add_widget(btn)
         self.root.ids.status_label.text = f"Places to visit: {self.collection.get_unvisited_count()}"
@@ -86,6 +87,4 @@ class TravelApp(App):
 
 
 if __name__ == '__main__':
-    app = TravelApp()
-    app.run()
-    app.collection.save_places("places.json")
+    TravelApp().run()
